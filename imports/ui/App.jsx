@@ -1,89 +1,30 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Meteor } from 'meteor/meteor';
 import { useTracker } from 'meteor/react-meteor-data';
-import { TasksCollection } from '/imports/db/TasksCollection';
-import { Task } from './Task';
-import { TaskForm } from './TaskForm';
 import { LoginForm } from './LoginForm';
-
-const toggleChecked = ({ _id, isChecked }) => Meteor.call('tasks.setIsChecked', _id, !isChecked);
-const deleteTask = ({ _id }) => Meteor.call('tasks.remove', _id);
+import { TaskContainer } from './TaskContainer';
+import { Route, Routes } from 'react-router-dom';
+import { Header } from './Header';
+import { SignUpForm } from './SignUpForm';
+import { Dashboard } from './Dashboard';
+import { EditTask } from './EditTask';
+import { UserProfile } from './UserProfile';
 
 export const App = () => {
   const user = useTracker(() => Meteor.user());
-  const logout = () => Meteor.logout();
-
-  const [hideCompleted, setHideCompleted] = useState(false);
-
-  const hideCompletedFilter = { isChecked: { $ne: true } };
-  const userFilter = user ? { userId: user._id } : {};
-  const pendingOnlyFilter = { ...hideCompletedFilter, ...userFilter };
-
-  const { tasks, pendingTasksCount, isLoading } = useTracker(() => {
-    const noDataAvailable = { tasks: [], pendingTasksCount: 0 };
-    if (!Meteor.user()) {
-      return noDataAvailable;
-    }
-    const handler = Meteor.subscribe('tasks');
-
-    if (!handler.ready()) {
-      return { ...noDataAvailable, isLoading: true };
-    }
-
-    const tasks = TasksCollection.find(
-      hideCompleted ? pendingOnlyFilter : userFilter,
-      {
-        sort: { createdAt: -1 },
-      }
-    ).fetch();
-    const pendingTasksCount = TasksCollection.find(pendingOnlyFilter).count();
-
-    return { tasks, pendingTasksCount };
-  });
-
-  const pendingTasksTitle = `${pendingTasksCount ? ` (${pendingTasksCount})` : ''}`;
-
   return (
     <div className="app">
-      <header>
-        <div className="app-bar">
-          <div className="app-header">
-            <h1>📝️ To Do List
-              {pendingTasksTitle}
-            </h1>
-          </div>
-        </div>
-      </header>
-      {user ? (
-        <>
-          <div className="main">
-            <div className="user" onClick={logout}>
-              {user.username || user.profile.name} 🚪
-            </div>
-            <TaskForm />
-            <div className="filter">
-              <button onClick={() => setHideCompleted(!hideCompleted)}>
-                {hideCompleted ? 'Show All' : 'Hide Completed'}
-              </button>
-            </div>
-            {isLoading && <div className="loading">loading...</div>}
-            <ul className="tasks">
-              {tasks.map(task => (
-                <Task
-                  key={task._id}
-                  task={task}
-                  onCheckboxClick={toggleChecked}
-                  onDeleteClick={deleteTask}
-                />
-              ))}
-            </ul>
-          </div>
-        </>
-      ) :
-        (
-          <LoginForm />
-        )
-      }
+      <Header />
+      <Routes>
+        <Route path="/" element={<LoginForm />} />
+        <Route path="/login" element={<LoginForm />} />
+        <Route path="/tasks" element={user ? <TaskContainer /> : <LoginForm />} />
+        <Route path="/dashboard" element={user ? <Dashboard /> : <LoginForm />} />
+        <Route path="/signup" element={<SignUpForm />} />
+        <Route path="/edittask/:id" element={<EditTask />} />
+        <Route path="/profile" element={user ? <UserProfile /> : <LoginForm />} />
+        <Route path="*" element={<LoginForm />} />
+      </Routes>
     </div>
   );
 };

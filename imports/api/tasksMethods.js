@@ -12,6 +12,8 @@ Meteor.methods({
 
     TasksCollection.insert({
       text,
+      name: text,
+      situation: 'registered',
       createdAt: new Date,
       userId: this.userId,
     })
@@ -31,6 +33,37 @@ Meteor.methods({
     }
 
     TasksCollection.remove(taskId);
+  },
+
+  'task.getById'(taskId) {
+    check(taskId, String);
+
+    const _task = TasksCollection.findOne({ _id: taskId });
+    if (!_task) {
+      throw new Meteor.Error('task-not-found', 'Task not found');
+    }
+    return _task;
+  },
+
+  'tasks.update'(taskId, task) {
+    check(taskId, String);
+    check(task, Object);
+
+    if (!this.userId) {
+      throw new Meteor.Error('Not authorized.');
+    }
+
+    const userTask = TasksCollection.findOne({ _id: taskId, userId: this.userId });
+
+    if (!userTask) {
+      throw new Meteor.Error('Access denied.');
+    }
+
+    TasksCollection.update(taskId, {
+      $set: {
+        ...task,
+      },
+    });
   },
 
   'tasks.setIsChecked'(taskId, isChecked) {

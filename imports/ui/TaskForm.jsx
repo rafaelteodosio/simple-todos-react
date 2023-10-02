@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Meteor } from 'meteor/meteor';
 import PropTypes from 'prop-types';
+import { Button, Grid, TextField } from '@mui/material';
 
 export const TaskForm = () => {
   const [text, setText] = useState('');
@@ -14,15 +15,29 @@ export const TaskForm = () => {
   };
 
   return (
-    <form className="task-form" onSubmit={handleSubmit}>
-      <input
-        type="text"
-        placeholder="Type to add new tasks"
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-      />
-
-      <button type="submit">Add Task</button>
+    <form onSubmit={handleSubmit}>
+      <Grid flexWrap={'nowrap'} padding={2} justifyContent={'center'} container spacing={2} alignItems="center">
+        <Grid item >
+          <TextField
+            fullWidth
+            label="Nova Tarefa"
+            variant="outlined"
+            size="small"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+          />
+        </Grid>
+        <Grid item >
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            fullWidth
+          >
+            Adicionar
+          </Button>
+        </Grid>
+      </Grid>
     </form>
   );
 };
