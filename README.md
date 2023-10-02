@@ -1,9 +1,9 @@
 # Pré-requisitos
 Certifique-se de ter as seguintes ferramentas instaladas em sua máquina antes de prosseguir:
 
-- [Node.js](https://nodejs.org/) (v14 ou superior)
+- [Node.js](https://nodejs.org/) (v18 ou superior)
 - [Meteor.js](https://www.meteor.com/install)
-- [npm](https://www.npmjs.com/) (v6 ou superior)
+- [npm](https://www.npmjs.com/) (v10 ou superior)
 
 ## Instalação
 Siga estas etapas para configurar o ambiente de desenvolvimento local:
